@@ -11,13 +11,13 @@ export const lightVars = vars({
   '--primary-foreground': '0 0% 98%',
   '--secondary': '240 4.8% 95.9%',
   '--secondary-foreground': '240 5.9% 10%',
-  '--accent': '160 84% 39.4%',
+  '--accent': '239 84% 67%',
   '--accent-foreground': '0 0% 100%',
   '--destructive': '0 84.2% 60.2%',
   '--destructive-foreground': '0 0% 98%',
   '--border': '240 5.9% 90%',
   '--input': '240 5.9% 90%',
-  '--ring': '160 84% 39.4%',
+  '--ring': '239 84% 67%',
 });
 
 export const darkVars = vars({
@@ -31,11 +31,11 @@ export const darkVars = vars({
   '--primary-foreground': '240 5.9% 10%',
   '--secondary': '240 3.7% 10%',
   '--secondary-foreground': '0 0% 98%',
-  '--accent': '160 84% 39.4%',
+  '--accent': '239 84% 67%',
   '--accent-foreground': '0 0% 100%',
   '--destructive': '0 62.8% 30.6%',
   '--destructive-foreground': '0 0% 98%',
   '--border': '240 3.7% 15.9%',
   '--input': '240 3.7% 15.9%',
-  '--ring': '160 84% 39.4%',
+  '--ring': '239 84% 67%',
 });

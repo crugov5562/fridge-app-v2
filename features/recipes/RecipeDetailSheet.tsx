@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetScrollView,
@@ -46,13 +46,13 @@ export const RecipeDetailSheet = forwardRef<BottomSheetModal, Props>(
       >
         {isLoading || !detail ? (
           <View className="flex-1 items-center justify-center py-12">
-            <ActivityIndicator size="large" color="#10b981" />
+            <ActivityIndicator size="large" color="#6366F1" />
           </View>
         ) : (
           <BottomSheetScrollView showsVerticalScrollIndicator={false}>
             {/* фото-заглушка */}
-            <View className="h-48 items-center justify-center bg-emerald-950">
-              <ChefHat size={48} color="#10b981" strokeWidth={1} />
+            <View className="h-48 items-center justify-center bg-[#EEF0FD]">
+              <ChefHat size={48} color="#6366F1" strokeWidth={1} />
             </View>
 
             <View className="px-5 pb-10 pt-4">
@@ -80,13 +80,13 @@ export const RecipeDetailSheet = forwardRef<BottomSheetModal, Props>(
                 </Text>
               )}
 
-              {/* ── ингредиенты ── */}
+              {/* ингредиенты */}
               <Text className="mb-3 text-base font-bold text-foreground">Ингредиенты</Text>
               <View className="mb-5 gap-2">
                 {detail.ingredients.map((ing) => (
                   <View key={ing.name} className="flex-row items-center gap-3">
                     {ing.have ? (
-                      <CheckCircle2 size={18} color="#10b981" strokeWidth={1.5} />
+                      <CheckCircle2 size={18} color="#6366F1" strokeWidth={1.5} />
                     ) : (
                       <XCircle size={18} color={ing.is_optional ? '#9ca3af' : '#f59e0b'} strokeWidth={1.5} />
                     )}
@@ -101,7 +101,7 @@ export const RecipeDetailSheet = forwardRef<BottomSheetModal, Props>(
                 ))}
               </View>
 
-              {/* ── приготовление ── */}
+              {/* приготовление */}
               <Text className="mb-3 text-base font-bold text-foreground">Приготовление</Text>
               <Text className="mb-6 text-sm leading-relaxed text-foreground">
                 {detail.instructions}

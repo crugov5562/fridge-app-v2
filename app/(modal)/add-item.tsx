@@ -13,11 +13,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import DateTimePicker, {
-  DateTimePickerAndroid,
-  type DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
-import { X, Calendar, MapPin, CheckCircle2 } from 'lucide-react-native';
+import { X, MapPin, CheckCircle2 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { inventory, catalog, classify, type ClassifyProductResponse } from '@/lib/api';
 import { useFridgeStore } from '@/lib/fridge-store';
@@ -36,12 +32,10 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-function formatDate(d: Date): string {
+function addDays(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
   return d.toISOString().split('T')[0];
-}
-
-function displayDate(d: Date): string {
-  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export default function AddItemModal() {
@@ -49,8 +43,7 @@ export default function AddItemModal() {
   const qc = useQueryClient();
   const activeFridgeId = useFridgeStore((s) => s.activeFridgeId);
 
-  const [expiryDate, setExpiryDate] = useState<Date | null>(null);
-  const [showIosPicker, setShowIosPicker] = useState(false);
+  const [expiryText, setExpiryText] = useState('');
   const [isClassifying, setIsClassifying] = useState(false);
   const [classifyResult, setClassifyResult] = useState<ClassifyProductResponse | null>(null);
 
@@ -81,7 +74,6 @@ export default function AddItemModal() {
   const selectedUnitId = watch('unit_id');
   const productName = watch('name');
 
-  // автоклассификация с debounce 800ms
   useEffect(() => {
     const name = productName.trim();
     if (name.length < 2) {
@@ -113,16 +105,11 @@ export default function AddItemModal() {
         }
 
         if (result.expiry_days > 0) {
-          setExpiryDate((prev) => {
-            if (prev) return prev;
-            const d = new Date();
-            d.setDate(d.getDate() + result.expiry_days);
-            return d;
-          });
+          setExpiryText((prev) => prev || addDays(result.expiry_days));
         }
 
       } catch {
-        // silent — пользователь заполнит вручную
+        // silently ignore classify errors
       } finally {
         setIsClassifying(false);
       }
@@ -146,9 +133,7 @@ export default function AddItemModal() {
         if (u) setValue('unit_id', u.id);
       }
       if (result.expiry_days > 0) {
-        const d = new Date();
-        d.setDate(d.getDate() + result.expiry_days);
-        setExpiryDate(d);
+        setExpiryText(addDays(result.expiry_days));
       }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
@@ -171,22 +156,6 @@ export default function AddItemModal() {
     },
   });
 
-  const openDatePicker = useCallback(() => {
-    const current = expiryDate ?? new Date();
-    if (Platform.OS === 'android') {
-      DateTimePickerAndroid.open({
-        value: current,
-        mode: 'date',
-        minimumDate: new Date(),
-        onChange: (_evt: DateTimePickerEvent, date?: Date) => {
-          if (date) setExpiryDate(date);
-        },
-      });
-    } else {
-      setShowIosPicker((v) => !v);
-    }
-  }, [expiryDate]);
-
   const onSubmit = useCallback(
     (values: FormValues) => {
       if (!activeFridgeId) {
@@ -200,11 +169,11 @@ export default function AddItemModal() {
         zone_type_id: classifyResult?.zone_type_id ?? undefined,
         unit_id: values.unit_id,
         quantity: values.quantity,
-        expiry_date: expiryDate ? formatDate(expiryDate) : undefined,
+        expiry_date: expiryText.trim() || undefined,
         notes: values.notes?.trim() || undefined,
       });
     },
-    [activeFridgeId, expiryDate, classifyResult, saveMutation]
+    [activeFridgeId, expiryText, classifyResult, saveMutation]
   );
 
   return (
@@ -253,7 +222,7 @@ export default function AddItemModal() {
                 <Skeleton className="h-3.5 w-40 rounded-md" />
               ) : classifyResult ? (
                 <View className="flex-row items-center gap-1.5">
-                  <CheckCircle2 size={13} color="#10b981" strokeWidth={2} />
+                  <CheckCircle2 size={13} color="#6366F1" strokeWidth={2} />
                   <Text className="text-sm text-accent">Категория определена</Text>
                   <Pressable onPress={handleManualClassify} hitSlop={8}>
                     <Text className="text-sm text-muted-foreground"> · ещё раз</Text>
@@ -349,8 +318,8 @@ export default function AddItemModal() {
           {/* рекомендация зоны хранения */}
           {classifyResult?.zone_name && (
             <View className="flex-row items-start gap-3 rounded-2xl border border-border bg-card px-4 py-3">
-              <View className="mt-0.5 h-8 w-8 items-center justify-center rounded-xl bg-emerald-50">
-                <MapPin size={16} color="#10b981" strokeWidth={1.5} />
+              <View className="mt-0.5 h-8 w-8 items-center justify-center rounded-xl bg-[#EDEFFD]">
+                <MapPin size={16} color="#6366F1" strokeWidth={1.5} />
               </View>
               <View className="flex-1">
                 <Text className="text-sm font-semibold text-foreground">Рекомендуемая зона</Text>
@@ -365,32 +334,15 @@ export default function AddItemModal() {
           )}
 
           {/* срок годности */}
-          <View>
-            <Text className="mb-2 text-sm font-medium text-foreground">Срок годности</Text>
-            <Pressable
-              onPress={openDatePicker}
-              className="active:opacity-70 flex-row items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3"
-              accessibilityRole="button"
-              accessibilityLabel="Выбрать дату"
-            >
-              <Calendar size={18} color="#10b981" strokeWidth={1.5} />
-              <Text className={expiryDate ? 'text-foreground' : 'text-muted-foreground'}>
-                {expiryDate ? displayDate(expiryDate) : 'Выбрать дату...'}
-              </Text>
-            </Pressable>
-            {showIosPicker && Platform.OS === 'ios' && (
-              <DateTimePicker
-                value={expiryDate ?? new Date()}
-                mode="date"
-                minimumDate={new Date()}
-                onChange={(_evt: DateTimePickerEvent, date?: Date) => {
-                  if (date) setExpiryDate(date);
-                  setShowIosPicker(false);
-                }}
-                style={{ marginTop: 8 }}
-              />
-            )}
-          </View>
+          <Input
+            label="Срок годности"
+            placeholder="ГГГГ-ММ-ДД"
+            value={expiryText}
+            onChangeText={setExpiryText}
+            keyboardType="numbers-and-punctuation"
+            returnKeyType="next"
+            hint="Например: 2026-06-30"
+          />
 
           {/* заметка */}
           <Controller

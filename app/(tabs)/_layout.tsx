@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import { View, Pressable, useColorScheme } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
 import { Home, UtensilsCrossed, ScanLine, Clock, User } from 'lucide-react-native';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -16,11 +16,11 @@ function FABButton({ onPress }: { onPress: () => void }) {
           width: 56,
           height: 56,
           borderRadius: 28,
-          backgroundColor: '#10b981',
+          backgroundColor: '#6366F1',
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: 20,
-          shadowColor: '#10b981',
+          shadowColor: '#6366F1',
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.35,
           shadowRadius: 8,
@@ -37,8 +37,6 @@ function FABButton({ onPress }: { onPress: () => void }) {
 
 export default function TabsLayout() {
   const { isAuthenticated, isLoading } = useAuthStore();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
   const fabRef = useRef<BottomSheetModal>(null);
 
   const openFAB = useCallback(() => {
@@ -49,10 +47,10 @@ export default function TabsLayout() {
   if (isLoading) return null;
   if (!isAuthenticated) return <Redirect href="/(auth)/sign-in" />;
 
-  const activeColor = '#10b981';
-  const inactiveColor = isDark ? '#71717A' : '#A1A1AA';
-  const bgColor = isDark ? '#0A0A0B' : '#FFFFFF';
-  const borderColor = isDark ? '#27272A' : '#E4E4E7';
+  const activeColor = '#6366F1';
+  const inactiveColor = '#A1A1AA';
+  const bgColor = '#FFFFFF';
+  const borderColor = '#E4E4E7';
 
   return (
     <>

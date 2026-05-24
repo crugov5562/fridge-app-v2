@@ -91,7 +91,7 @@ export function Button({
           color={
             variant === 'primary' || variant === 'emerald' || variant === 'destructive'
               ? '#fff'
-              : '#10b981'
+              : '#6366F1'
           }
         />
       ) : typeof children === 'string' ? (

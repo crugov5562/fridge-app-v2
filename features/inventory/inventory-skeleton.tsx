@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View } from 'react-native';
 import { Skeleton } from '@/components/ui/Skeleton';
 
@@ -19,12 +19,12 @@ export function InventorySkeleton() {
   return (
     <View className="flex-1 bg-background">
       {/* hero skeleton */}
-      <View className="bg-emerald-100 px-5 pb-6 pt-4">
-        <Skeleton className="mb-3 h-7 w-2/5 rounded-xl bg-emerald-200" />
-        <Skeleton className="mb-4 h-8 w-3/5 rounded-xl bg-emerald-200" />
+      <View className="bg-[#EDEFFD] px-5 pb-6 pt-4">
+        <Skeleton className="mb-3 h-7 w-2/5 rounded-xl bg-[#C7C9F9]" />
+        <Skeleton className="mb-4 h-8 w-3/5 rounded-xl bg-[#C7C9F9]" />
         <View className="flex-row gap-2">
-          <Skeleton className="h-7 w-28 rounded-full bg-emerald-200" />
-          <Skeleton className="h-7 w-28 rounded-full bg-emerald-200" />
+          <Skeleton className="h-7 w-28 rounded-full bg-[#C7C9F9]" />
+          <Skeleton className="h-7 w-28 rounded-full bg-[#C7C9F9]" />
         </View>
       </View>
 

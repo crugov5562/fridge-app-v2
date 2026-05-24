@@ -50,7 +50,7 @@ export default function RecipesScreen() {
     <Screen safe scroll={false}>
       <RecipeDetailSheet ref={sheetRef} recipe={selectedRecipe} fridgeId={activeFridgeId} />
 
-      {/* ── заголовок ── */}
+      {/* заголовок */}
       <View className="px-4 pb-3 pt-4">
         <Text className="text-2xl font-bold text-foreground">Рецепты</Text>
 
@@ -95,10 +95,10 @@ export default function RecipesScreen() {
         )}
       </View>
 
-      {/* ── контент ── */}
+      {/* контент */}
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#10b981" />
+          <ActivityIndicator size="large" color="#6366F1" />
           <Text className="mt-3 text-sm text-muted-foreground">Подбираем рецепты...</Text>
         </View>
       ) : recipeList.length === 0 ? (

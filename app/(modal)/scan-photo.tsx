@@ -6,17 +6,12 @@ import {
   ScrollView,
   Alert,
   Image,
-  Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { CheckCircle2, AlertCircle, X, MapPin, Calendar } from 'lucide-react-native';
+import { CheckCircle2, AlertCircle, X, MapPin } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import DateTimePicker, {
-  DateTimePickerAndroid,
-  type DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
 import { TwoFrameScanner } from '@/features/scan-photo';
 import { inventory, catalog, classify, type ScanPhotoResponse, type ClassifyProductResponse } from '@/lib/api';
 import { useFridgeStore } from '@/lib/fridge-store';
@@ -27,27 +22,15 @@ type Phase = 'scanning' | 'confirming';
 type Ripeness = 'green' | 'ripe' | 'overripe';
 
 const RIPENESS_CHIPS: { id: Ripeness; label: string; dot: string; multiplier: number }[] = [
-  { id: 'green',    label: 'Зеленый',    dot: '#22c55e', multiplier: 2.0  },
-  { id: 'ripe',     label: 'Спелый',     dot: '#eab308', multiplier: 1.0  },
-  { id: 'overripe', label: 'Перезрелый', dot: '#f97316', multiplier: 0.35 },
+  { id: 'green',    label: 'Зеленый',    dot: '#A3E635', multiplier: 2.0  },
+  { id: 'ripe',     label: 'Спелый',     dot: '#F59E0B', multiplier: 1.0  },
+  { id: 'overripe', label: 'Перезрелый', dot: '#F97316', multiplier: 0.35 },
 ];
 
 function expiryFromDays(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() + Math.max(1, days));
   return d.toISOString().split('T')[0];
-}
-
-function formatExpiryBadge(dateStr: string): string {
-  const d = new Date(dateStr + 'T12:00:00');
-  const now = new Date();
-  now.setHours(12, 0, 0, 0);
-  const days = Math.round((d.getTime() - now.getTime()) / 86_400_000);
-  const label = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-  if (days <= 0) return 'просрочен';
-  if (days === 1) return `1 день · до ${label}`;
-  if (days < 5) return `${days} дня · до ${label}`;
-  return `${days} дней · до ${label}`;
 }
 
 export default function ScanPhotoModal() {
@@ -64,7 +47,6 @@ export default function ScanPhotoModal() {
   const [classifyResult, setClassifyResult] = useState<ClassifyProductResponse | null>(null);
   const [isClassifying, setIsClassifying] = useState(false);
   const [ripeness, setRipeness] = useState<Ripeness | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const { data: units } = useQuery({
     queryKey: ['units'],
@@ -72,7 +54,6 @@ export default function ScanPhotoModal() {
     staleTime: Infinity,
   });
 
-  // base days for ripeness calculation: prefer classify result, fallback to 7
   const baseDays = classifyResult?.expiry_days ?? 7;
 
   const applyRipeness = useCallback((r: Ripeness, base: number) => {
@@ -82,14 +63,13 @@ export default function ScanPhotoModal() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }, []);
 
-  // когда classify вернул expiry_days, пересчитываем дату если спелость уже выбрана
   useEffect(() => {
     if (classifyResult?.expiry_days && ripeness) {
       applyRipeness(ripeness, classifyResult.expiry_days);
     }
   }, [classifyResult]);
 
-  // автоклассификация с debounce — только когда пользователь вручную меняет имя
+  // автоклассификация с debounce
   useEffect(() => {
     if (phase !== 'confirming') return;
     const name = editedName.trim();
@@ -104,7 +84,6 @@ export default function ScanPhotoModal() {
       try {
         const result = await classify.product(name);
         setClassifyResult(result);
-        // обновляем дату только если expiry_auto (нет даты с этикетки)
         if (result.expiry_days > 0 && scanResult?.expiry_auto && !ripeness) {
           setEditedExpiry(expiryFromDays(result.expiry_days));
         }
@@ -170,22 +149,6 @@ export default function ScanPhotoModal() {
     });
   }, [activeFridgeId, editedName, editedExpiry, quantity, unitId, scanResult, classifyResult, saveMutation]);
 
-  const openCustomDate = useCallback(() => {
-    const current = editedExpiry ? new Date(editedExpiry) : new Date();
-    if (Platform.OS === 'android') {
-      DateTimePickerAndroid.open({
-        value: current,
-        mode: 'date',
-        minimumDate: new Date(),
-        onChange: (_: DateTimePickerEvent, date?: Date) => {
-          if (date) setEditedExpiry(date.toISOString().split('T')[0]);
-        },
-      });
-    } else {
-      setShowDatePicker(v => !v);
-    }
-  }, [editedExpiry]);
-
   const adjustExpiry = useCallback((days: number) => {
     const base = editedExpiry ? new Date(editedExpiry + 'T12:00:00') : new Date();
     base.setDate(base.getDate() + days);
@@ -236,10 +199,10 @@ export default function ScanPhotoModal() {
           />
         )}
 
-        {/* статус */}
+        {/* статус распознавания */}
         {!editedName.trim() ? (
           <View className="flex-row items-center gap-2 rounded-2xl border border-accent/40 bg-accent/10 px-4 py-3">
-            <AlertCircle size={16} color="#10b981" strokeWidth={2} />
+            <AlertCircle size={16} color="#6366F1" strokeWidth={2} />
             <Text className="flex-1 text-sm text-accent">
               Введите название — категория и срок заполнятся автоматически
             </Text>
@@ -255,7 +218,7 @@ export default function ScanPhotoModal() {
             {isClassifying ? (
               <AlertCircle size={16} color="#71717A" strokeWidth={2} />
             ) : scanResult?.confidence && scanResult.confidence >= 0.7 ? (
-              <CheckCircle2 size={16} color="#10b981" strokeWidth={2} />
+              <CheckCircle2 size={16} color="#6366F1" strokeWidth={2} />
             ) : (
               <AlertCircle size={16} color="#f59e0b" strokeWidth={2} />
             )}
@@ -280,8 +243,8 @@ export default function ScanPhotoModal() {
         {/* зона хранения */}
         {displayZoneName && (
           <View className="flex-row items-start gap-3 rounded-2xl border border-border bg-card px-4 py-3">
-            <View className="mt-0.5 h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-900/20">
-              <MapPin size={16} color="#10b981" strokeWidth={1.5} />
+            <View className="mt-0.5 h-8 w-8 items-center justify-center rounded-xl bg-[#EDEFFD]">
+              <MapPin size={16} color="#6366F1" strokeWidth={1.5} />
             </View>
             <View className="flex-1">
               <Text className="text-sm font-semibold text-foreground">Рекомендуемая зона</Text>
@@ -344,7 +307,7 @@ export default function ScanPhotoModal() {
           </View>
         </View>
 
-        {/* ─── срок годности ─── */}
+        {/* срок годности */}
         {isAutoExpiry ? (
           <View className="gap-3">
             <Text className="text-sm font-medium text-foreground">Срок годности</Text>
@@ -374,21 +337,18 @@ export default function ScanPhotoModal() {
               })}
             </View>
 
-            {/* дата + быстрая корректировка */}
-            {ripeness && editedExpiry ? (
-              <View className="rounded-2xl border border-border bg-card px-4 py-3 gap-3">
-                {/* вычисленная дата */}
-                <View className="flex-row items-center justify-between">
-                  <Text className="text-sm text-muted-foreground">Годен до</Text>
-                  <View className="rounded-full bg-accent/10 px-3 py-1">
-                    <Text className="text-sm font-semibold text-accent">
-                      {formatExpiryBadge(editedExpiry)}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* быстрые кнопки сдвига */}
-                <View className="flex-row gap-2">
+            {/* поле даты + быстрые кнопки */}
+            {ripeness ? (
+              <View className="gap-2 rounded-2xl border border-border bg-card px-4 py-3">
+                <Input
+                  label="Годен до (ГГГГ-ММ-ДД)"
+                  value={editedExpiry}
+                  onChangeText={setEditedExpiry}
+                  placeholder="ГГГГ-ММ-ДД"
+                  keyboardType="numbers-and-punctuation"
+                  hint="Можно скорректировать вручную"
+                />
+                <View className="flex-row gap-2 pt-1">
                   {[
                     { label: '+2 дня',  days: 2 },
                     { label: '+5 дней', days: 5 },
@@ -403,28 +363,6 @@ export default function ScanPhotoModal() {
                     </Pressable>
                   ))}
                 </View>
-
-                {/* своя дата */}
-                <Pressable
-                  onPress={openCustomDate}
-                  className="active:opacity-70 flex-row items-center justify-center gap-1.5"
-                >
-                  <Calendar size={13} color="#71717A" strokeWidth={2} />
-                  <Text className="text-sm text-muted-foreground">Своя дата</Text>
-                </Pressable>
-
-                {showDatePicker && Platform.OS === 'ios' && (
-                  <DateTimePicker
-                    value={editedExpiry ? new Date(editedExpiry) : new Date()}
-                    mode="date"
-                    minimumDate={new Date()}
-                    onChange={(_: DateTimePickerEvent, date?: Date) => {
-                      if (date) setEditedExpiry(date.toISOString().split('T')[0]);
-                      setShowDatePicker(false);
-                    }}
-                    style={{ marginTop: 4 }}
-                  />
-                )}
               </View>
             ) : (
               <Text className="text-xs text-muted-foreground">
@@ -433,7 +371,6 @@ export default function ScanPhotoModal() {
             )}
           </View>
         ) : (
-          /* продукт с этикеткой — обычное текстовое поле */
           <Input
             label="Срок годности (ГГГГ-ММ-ДД)"
             value={editedExpiry}

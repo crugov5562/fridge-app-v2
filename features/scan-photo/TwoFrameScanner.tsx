@@ -63,7 +63,7 @@ export function TwoFrameScanner({ onResult, onCancel }: Props) {
   if (!permission.granted) {
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-background px-6">
-        <AlertCircle size={48} color="#10b981" strokeWidth={1.5} />
+        <AlertCircle size={48} color="#6366F1" strokeWidth={1.5} />
         <Text className="text-center text-lg font-semibold text-foreground">
           Нужен доступ к камере
         </Text>
@@ -83,7 +83,7 @@ export function TwoFrameScanner({ onResult, onCancel }: Props) {
   if (step === 'processing') {
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-background">
-        <ActivityIndicator size="large" color="#10b981" />
+        <ActivityIndicator size="large" color="#6366F1" />
         <Text className="text-base text-muted-foreground">Анализируем продукт...</Text>
       </View>
     );

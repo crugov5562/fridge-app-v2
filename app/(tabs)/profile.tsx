@@ -7,7 +7,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { auth } from '@/lib/api';
 
-
 const NOTIFY_OPTIONS = [1, 2, 3, 5] as const;
 
 const PREFERENCES = [
@@ -100,7 +99,7 @@ export default function ProfileScreen() {
       {/* уведомления */}
       <View className="mx-4 mb-4 overflow-hidden rounded-2xl border border-border bg-card">
         <SectionHeader
-          icon={<Bell size={18} color="#10b981" strokeWidth={1.5} />}
+          icon={<Bell size={18} color="#6366F1" strokeWidth={1.5} />}
           title="Уведомления"
         />
         <View className="mx-4 h-px bg-separator" />
@@ -131,7 +130,7 @@ export default function ProfileScreen() {
       {/* предпочтения */}
       <View className="mx-4 mb-6 overflow-hidden rounded-2xl border border-border bg-card">
         <SectionHeader
-          icon={<Utensils size={18} color="#10b981" strokeWidth={1.5} />}
+          icon={<Utensils size={18} color="#6366F1" strokeWidth={1.5} />}
           title="Пищевые предпочтения"
         />
         <View className="mx-4 h-px bg-separator" />

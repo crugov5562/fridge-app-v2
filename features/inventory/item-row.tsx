@@ -5,17 +5,18 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { Clock, AlertTriangle, AlertCircle, HelpCircle, CheckCircle, Trash2 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { getExpiryInfo, type ExpiryStatus } from '@/utils/expiry';
+import { getCategoryColor } from '@/utils/category-color';
 import type { InventoryItem } from '@/lib/api';
 
 const BADGE_CONFIG: Record<ExpiryStatus, { bg: string; textColor: string; Icon: typeof Clock }> = {
-  safe: { bg: 'bg-emerald-50', textColor: 'text-emerald-700', Icon: CheckCircle },
+  safe: { bg: 'bg-[#EDEFFD]', textColor: 'text-[#6366F1]', Icon: CheckCircle },
   warning: { bg: 'bg-warning-subtle', textColor: 'text-warning', Icon: AlertTriangle },
   danger: { bg: 'bg-error-subtle', textColor: 'text-error', Icon: AlertCircle },
   unknown: { bg: 'bg-muted', textColor: 'text-muted-foreground', Icon: HelpCircle },
 };
 
 const BADGE_ICON_COLOR: Record<ExpiryStatus, string> = {
-  safe: '#059669',
+  safe: '#6366F1',
   warning: '#F59E0B',
   danger: '#EF4444',
   unknown: '#71717A',
@@ -48,7 +49,7 @@ function renderRightActions(onUse: () => void, onDiscard: () => void) {
     <View className="flex-row">
       <Pressable
         onPress={onUse}
-        className="w-24 items-center justify-center bg-emerald-500"
+        className="w-24 items-center justify-center bg-[#6366F1]"
         accessibilityRole="button"
         accessibilityLabel="Использовал"
       >
@@ -90,40 +91,50 @@ export const ItemRow = React.memo(function ItemRow({ item, categoryName, unitAbb
     ? item.photo_url.startsWith('http') ? item.photo_url : `${BASE}${item.photo_url}`
     : null;
 
+  const catColor = getCategoryColor(categoryName || item.name);
+
   return (
     <Swipeable
       renderRightActions={() => renderRightActions(handleUse, handleDiscard)}
       overshootRight={false}
     >
-      <Pressable onPress={handlePress} className="active:opacity-70 flex-row items-center gap-3 bg-background px-4 py-3">
-        {photoUri ? (
-          <Image
-            source={{ uri: photoUri }}
-            style={{ width: 48, height: 48, borderRadius: 12 }}
-            contentFit="cover"
-          />
-        ) : (
-          <View className="h-12 w-12 items-center justify-center rounded-xl bg-emerald-50">
-            <Text className="text-lg font-bold text-emerald-700">{firstLetter}</Text>
+      <Pressable onPress={handlePress} className="active:opacity-70 flex-row items-center bg-background">
+        {/* цветной акцент категории */}
+        <View style={{ width: 4, backgroundColor: catColor }} className="self-stretch rounded-r" />
+
+        <View className="flex-1 flex-row items-center gap-3 px-4 py-3">
+          {photoUri ? (
+            <Image
+              source={{ uri: photoUri }}
+              style={{ width: 48, height: 48, borderRadius: 14 }}
+              contentFit="cover"
+            />
+          ) : (
+            <View
+              style={{ backgroundColor: catColor + '22', width: 48, height: 48, borderRadius: 14 }}
+              className="items-center justify-center"
+            >
+              <Text style={{ color: catColor }} className="text-lg font-black">{firstLetter}</Text>
+            </View>
+          )}
+
+          <View className="flex-1">
+            <Text className="font-semibold text-foreground" numberOfLines={1}>
+              {item.name}
+            </Text>
+            <Text className="mt-0.5 text-xs text-muted-foreground" numberOfLines={1}>
+              {categoryName}
+              {item.quantity !== 1 || unitAbbr
+                ? ` · ${item.quantity} ${unitAbbr}`.trim()
+                : ''}
+            </Text>
           </View>
-        )}
 
-        <View className="flex-1">
-          <Text className="font-medium text-foreground" numberOfLines={1}>
-            {item.name}
-          </Text>
-          <Text className="mt-0.5 text-sm text-muted-foreground" numberOfLines={1}>
-            {categoryName}
-            {item.quantity !== 1 || unitAbbr
-              ? ` · ${item.quantity} ${unitAbbr}`.trim()
-              : ''}
-          </Text>
+          <ExpiryBadge date={item.expiry_date} />
         </View>
-
-        <ExpiryBadge date={item.expiry_date} />
       </Pressable>
 
-      <View className="mx-4 h-px bg-separator" />
+      <View className="ml-14 h-px bg-separator" />
     </Swipeable>
   );
 });
