@@ -31,7 +31,12 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
+
+# mcp config (contains secrets)
+.mcp.json
+.claude/
 
 # typescript
 *.tsbuildinfo
@@ -39,3 +44,9 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+backend/.env

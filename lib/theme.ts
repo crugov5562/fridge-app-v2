@@ -1,0 +1,41 @@
+import { vars } from 'nativewind';
+
+export const lightVars = vars({
+  '--background': '0 0% 100%',
+  '--foreground': '240 10% 3.9%',
+  '--card': '0 0% 100%',
+  '--card-foreground': '240 10% 3.9%',
+  '--muted': '240 4.8% 95.9%',
+  '--muted-foreground': '240 3.8% 46.1%',
+  '--primary': '221 39% 11%',
+  '--primary-foreground': '0 0% 98%',
+  '--secondary': '240 4.8% 95.9%',
+  '--secondary-foreground': '240 5.9% 10%',
+  '--accent': '160 84% 39.4%',
+  '--accent-foreground': '0 0% 100%',
+  '--destructive': '0 84.2% 60.2%',
+  '--destructive-foreground': '0 0% 98%',
+  '--border': '240 5.9% 90%',
+  '--input': '240 5.9% 90%',
+  '--ring': '160 84% 39.4%',
+});
+
+export const darkVars = vars({
+  '--background': '240 5.2% 4.1%',
+  '--foreground': '0 0% 98%',
+  '--card': '240 7% 8.4%',
+  '--card-foreground': '0 0% 98%',
+  '--muted': '240 3.7% 10%',
+  '--muted-foreground': '240 3.9% 64.9%',
+  '--primary': '0 0% 98%',
+  '--primary-foreground': '240 5.9% 10%',
+  '--secondary': '240 3.7% 10%',
+  '--secondary-foreground': '0 0% 98%',
+  '--accent': '160 84% 39.4%',
+  '--accent-foreground': '0 0% 100%',
+  '--destructive': '0 62.8% 30.6%',
+  '--destructive-foreground': '0 0% 98%',
+  '--border': '240 3.7% 15.9%',
+  '--input': '240 3.7% 15.9%',
+  '--ring': '160 84% 39.4%',
+});
